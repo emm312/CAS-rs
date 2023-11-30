@@ -28,6 +28,10 @@ pub enum Func {
     Sin(Expr),
     Cos(Expr),
     Tan(Expr),
+
+    // Logarithms
+    Ln(Expr),
+    Log(Expr, Expr),
 }
 
 pub trait IsConst {
@@ -72,7 +76,11 @@ impl Display for Term {
             "{}",
             self.factors
                 .iter()
-                .map(|factor| format!("{}^{}", factor.0, factor.1))
+                .map(|factor| if factor.1.terms.len() == 1 {
+                    format!("{}^{}", factor.0, factor.1)
+                } else {
+                    format!("{}^({})", factor.0, factor.1)
+                })
                 .collect::<Vec<_>>()
                 .join(" * ")
         )?;
@@ -102,6 +110,9 @@ impl Display for Func {
             Self::Sin(expr) => write!(f, "sin({})", expr)?,
             Self::Cos(expr) => write!(f, "cos({})", expr)?,
             Self::Tan(expr) => write!(f, "tan({})", expr)?,
+
+            Self::Ln(expr) => write!(f, "ln({})", expr)?,
+            Self::Log(base, expr) => write!(f, "log({}, {})", base, expr)?,
         }
 
         Ok(())

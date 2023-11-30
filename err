@@ -1,0 +1,385 @@
+   Compiling cas_rs v0.1.0 (/Users/emm312/Desktop/coding/rust/CAS-rs)
+error: failed to run custom build command for `cas_rs v0.1.0 (/Users/emm312/Desktop/coding/rust/CAS-rs)`
+
+Caused by:
+  process didn't exit successfully: `/Users/emm312/Desktop/coding/rust/CAS-rs/target/debug/build/cas_rs-bb16f422a6612837/build-script-build` (exit status: 1)
+  --- stdout
+  processing file `/Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop`
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Local ambiguity detected
+
+    The problem arises after having observed the following symbols in the input:
+      Number "^" FullTerm+
+    At that point, if the next token is a `r#"[0-9]+(\\.[0-9]+)?"#`, then the parser can proceed
+    in two different ways.
+
+    First, the parser could execute the production at
+    /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35, which would consume
+    the top 1 token(s) from the stack and produce a `Expr`. This might then yield a parse tree
+    like
+      Number "^" FullTerm+╷ FullFactor
+      │          ├─Expr───┤          │
+      │          └─Factor─┤          │
+      ├─FullFactor────────┤          │
+      ├─FullFactor+───────┘          │
+      └─FullFactor+──────────────────┘
+
+    Alternatively, the parser could shift the `r#"[0-9]+(\\.[0-9]+)?"#` token and later use it to
+    construct a `Number`. This might then yield a parse tree like
+      FullTerm+ r#"[0-9]+(\\.[0-9]+)?"# "*" Term
+      │         ├─Number──────────────┘        │
+      │         └─FullTerm─────────────────────┤
+      └─FullTerm+──────────────────────────────┘
+
+    Hint: It appears you could resolve this problem by replacing uses of `Expr` with
+    `FullTerm+?` (or, alternatively, by adding the annotation `#[inline]` to the definition of
+    Expr). For more information, see the section on inlining in the LALROP manual.
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:12:5: 12:39: Local ambiguity detected
+
+    The problem arises after having observed the following symbols in the input:
+      Number "*"
+    At that point, if the next token is a `r#"[0-9]+(\\.[0-9]+)?"#`, then the parser can proceed in
+    two different ways.
+
+    First, the parser could execute the production at
+    /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:12:5: 12:39, which would consume
+    the top 0 token(s) from the stack and produce a `Term`. This might then yield a parse tree like
+      Number "*" ╷      ╷ FullTerm
+      │          └─Term─┤        │
+      ├─FullTerm────────┤        │
+      ├─FullTerm+───────┘        │
+      └─FullTerm+────────────────┘
+
+    Alternatively, the parser could shift the `r#"[0-9]+(\\.[0-9]+)?"#` token and later use it to
+    construct a `Number`. This might then yield a parse tree like
+      Number "*" r#"[0-9]+(\\.[0-9]+)?"# "^" Factor
+      │          ├─Number──────────────┘          │
+      │          ├─FullFactor─────────────────────┤
+      │          ├─FullFactor+────────────────────┤
+      │          └─Term───────────────────────────┤
+      └─FullTerm──────────────────────────────────┘
+
+    Hint: It appears you could resolve this problem by replacing uses of `Term` with
+    `FullFactor+?` (or, alternatively, by adding the annotation `#[inline]` to the definition of
+    Term). For more information, see the section on inlining in the LALROP manual.
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:12:5: 12:39: Local ambiguity detected
+
+    The problem arises after having observed the following symbols in the input:
+      Number "*" FullFactor+
+    At that point, if the next token is a `r#"[0-9]+(\\.[0-9]+)?"#`, then the parser can proceed in
+    two different ways.
+
+    First, the parser could execute the production at
+    /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:12:5: 12:39, which would consume
+    the top 1 token(s) from the stack and produce a `Term`. This might then yield a parse tree like
+      Number "*" FullFactor+ FullTerm
+      │          └─Term────┤        │
+      ├─FullTerm───────────┤        │
+      ├─FullTerm+──────────┘        │
+      └─FullTerm+───────────────────┘
+
+    Alternatively, the parser could shift the `r#"[0-9]+(\\.[0-9]+)?"#` token and later use it to
+    construct a `Number`. This might then yield a parse tree like
+      FullFactor+ r#"[0-9]+(\\.[0-9]+)?"# "^" Factor
+      │           ├─Number──────────────┘          │
+      │           └─FullFactor─────────────────────┤
+      └─FullFactor+────────────────────────────────┘
+
+    Hint: It appears you could resolve this problem by replacing uses of `Term` with
+    `FullFactor+?` (or, alternatively, by adding the annotation `#[inline]` to the definition of
+    Term). For more information, see the section on inlining in the LALROP manual.
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Expr ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Function ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Number ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Variable ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullFactor = Number "^" (*) Factor ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "cos" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "ln" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "log" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sin" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sqrt" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "tan" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Variable = (*) r#"[a-zA-Z]"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `"cos"` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Expr ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Function ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Number ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Variable ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullFactor = Number "^" (*) Factor ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "cos" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "ln" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "log" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sin" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sqrt" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "tan" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Variable = (*) r#"[a-zA-Z]"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `"ln"` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Expr ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Function ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Number ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Variable ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullFactor = Number "^" (*) Factor ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "cos" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "ln" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "log" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sin" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sqrt" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "tan" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Variable = (*) r#"[a-zA-Z]"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `"log"` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Expr ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Function ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Number ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Variable ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullFactor = Number "^" (*) Factor ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "cos" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "ln" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "log" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sin" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sqrt" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "tan" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Variable = (*) r#"[a-zA-Z]"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `"sin"` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Expr ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Function ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Number ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Variable ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullFactor = Number "^" (*) Factor ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "cos" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "ln" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "log" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sin" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sqrt" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "tan" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Variable = (*) r#"[a-zA-Z]"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `"sqrt"` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Expr ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Function ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Number ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Variable ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullFactor = Number "^" (*) Factor ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "cos" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "ln" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "log" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sin" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sqrt" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "tan" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Variable = (*) r#"[a-zA-Z]"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `"tan"` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Local ambiguity detected
+
+    The problem arises after having observed the following symbols in the input:
+      Number "^"
+    At that point, if the next token is a `r#"[0-9]+(\\.[0-9]+)?"#`, then the parser can proceed
+    in two different ways.
+
+    First, the parser could execute the production at
+    /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35, which would consume
+    the top 0 token(s) from the stack and produce a `Expr`. This might then yield a parse tree
+    like
+      Number "^" ╷        ╷ FullFactor
+      │          ├─Expr───┤          │
+      │          └─Factor─┤          │
+      ├─FullFactor────────┤          │
+      ├─FullFactor+───────┘          │
+      └─FullFactor+──────────────────┘
+
+    Alternatively, the parser could shift the `r#"[0-9]+(\\.[0-9]+)?"#` token and later use it to
+    construct a `Number`. This might then yield a parse tree like
+      Number "^" r#"[0-9]+(\\.[0-9]+)?"#
+      │          ├─Number──────────────┤
+      │          └─Factor──────────────┤
+      └─FullFactor─────────────────────┘
+
+    Hint: It appears you could resolve this problem by replacing uses of `Expr` with
+    `FullTerm+?` (or, alternatively, by adding the annotation `#[inline]` to the definition of
+    Expr). For more information, see the section on inlining in the LALROP manual.
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Expr ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Function ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Number ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Factor = (*) Variable ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullFactor = Number "^" (*) Factor ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "cos" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "ln" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "log" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sin" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "sqrt" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = (*) "tan" "(" Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Variable = (*) r#"[a-zA-Z]"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `r#"[a-zA-Z]"#` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:21:5: 21:32: Conflict detected
+
+      when in this state:
+    Factor = Number (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = Number (*) "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `"*"` we can reduce to a `Factor` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = "cos" "(" (*) Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `r#"[0-9]+(\\.[0-9]+)?"#` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = "ln" "(" (*) Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `r#"[0-9]+(\\.[0-9]+)?"#` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = "log" "(" (*) Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `r#"[0-9]+(\\.[0-9]+)?"#` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = "sin" "(" (*) Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `r#"[0-9]+(\\.[0-9]+)?"#` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = "sqrt" "(" (*) Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `r#"[0-9]+(\\.[0-9]+)?"#` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Expr = (*) FullTerm+ ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = (*) FullTerm+ FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Function = "tan" "(" (*) Expr ")" ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `r#"[0-9]+(\\.[0-9]+)?"#` we can reduce to a `Expr` but we can also shift
+
+  /Users/emm312/Desktop/coding/rust/CAS-rs/src/parser.lalrpop:4:5: 4:35: Conflict detected
+
+      when in this state:
+    Expr = FullTerm+ (*) ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm = (*) Number "*" Term ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    FullTerm+ = FullTerm+ (*) FullTerm ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+    Number = (*) r#"[0-9]+(\\.[0-9]+)?"# ["(", ")", "*", "^", "cos", "ln", "log", "sin", "sqrt", "tan", r#"[0-9]+(\\.[0-9]+)?"#, r#"[a-zA-Z]"#, Eof]
+
+    and looking at a token `r#"[0-9]+(\\.[0-9]+)?"#` we can reduce to a `Expr` but we can also shift
+

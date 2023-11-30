@@ -1,0 +1,35 @@
+grammar;
+
+pub Expr: Expr = {
+    FullTerm* => Expr { terms: <> },
+}
+
+FullTerm: (f64, Term) = {
+    <Number> "*" <Term> => (<>),
+}
+
+Term: Term = {
+    FullFactor* => Term { factors: <> },
+}
+
+FullFactor: (f64, Factor) = {
+    <Number> "^" <Factor> => (<>),
+}
+
+Factor: Factor = {
+    Expr => Factor::Expr(<>),
+    Number => Factor::Number(<>),
+    Function => Factor::Function(<>),
+    Variable => Factor::Variable(<>),
+}
+
+Number: f64 = r"[0-9]+(\.[0-9]+)?" => <>.parse().unwrap();
+Variable: char = r"[a-zA-Z]" => <>.chars().next().unwrap();
+Function: Function = {
+    "sqrt" "(" Expr ")" => Function::Sqrt(<>),
+    "sin" "(" Expr ")" => Function::Sin(<>),
+    "cos" "(" Expr ")" => Function::Cos(<>),
+    "tan" "(" Expr ")" => Function::Tan(<>),
+    "ln" "(" Expr ")" => Function::Ln(<>),
+    "log" "(" Expr ")" => Function::Log(<>),
+}
